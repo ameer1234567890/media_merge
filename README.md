@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ameer1234567890/media_merge.svg?branch=master)](https://travis-ci.org/ameer1234567890/media_merge)
+
 #### Works with
 * Almost any linux based shell.
 * Cygwin shell on Windows.
