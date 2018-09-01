@@ -37,6 +37,7 @@ mkdir -p "$output_folder"
 files_count="$(< tmp wc -l 2> /dev/null)"
 if [ "$files_count" -eq 0 ]; then
   log_error "No pictures found! Exiting....\n"
+  rm tmp
   exit 1
 fi
 
@@ -50,7 +51,7 @@ while IFS= read -r file; do
   
   audio_file="$(echo "$video_file" | cut -d '/' -f 2)"
   audio_file="${audio_file%.*}"
-  audio_exts="MP4 mp4 MPG mpg MPEG mpeg AVI avi WMV wmv MOV mov 3GP 3gp M4A m4a MP3 mp3 WMA wma AAC aac"
+  audio_exts="MP4 mp4 MPG mpg MPEG mpeg AVI avi WMV wmv MOV mov 3GP 3gp M4A m4a MP3 mp3 WMA wma AAC aac WAV wav"
   for ext in $audio_exts; do
     if [ -f "$audio_folder/$audio_file.$ext" ]; then
       audio_file="$audio_file.$ext"
@@ -65,7 +66,7 @@ while IFS= read -r file; do
   else
     echo "OK"
     log_info "Merging file $count... "
-    ffmpeg -hide_banner -loglevel panic -i "$video_folder/$video_file" -i "$audio_folder/$audio_file" -c copy "$output_folder/$video_file"
+    ffmpeg -hide_banner -loglevel panic -i "$video_folder/$video_file" -i "$audio_folder/$audio_file" -c copy -map 0:v:0 -map 1:a:0 "$output_folder/$video_file"
 
     ffmpeg_status="$?"
     if [ "$ffmpeg_status" != 0 ]; then
