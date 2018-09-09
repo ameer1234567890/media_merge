@@ -15,6 +15,18 @@ log_error(){
   printf "[\e[36m%s\e[0m] [\e[91mERROR\e[0m] $*" "$(date +'%H:%M:%S')"
 }
 
+check_tools(){
+  tools="ffmpeg"
+  for tool in $tools; do
+    if [ ! "$(command -v "$tool")" ]; then
+      printf "\e[1m%s\e[0m not found! Exiting....\n" "$tool"
+      exit 1
+    fi
+  done
+}
+
+check_tools
+
 {
   find $video_folder ! -name "$(printf "*\n*")" -name '*.MP4' 2> /dev/null
   find $video_folder ! -name "$(printf "*\n*")" -name '*.mp4' 2> /dev/null
@@ -32,14 +44,14 @@ log_error(){
   find $video_folder ! -name "$(printf "*\n*")" -name '*.3gp' 2> /dev/null
 } > tmp
 
-mkdir -p "$output_folder"
-
 files_count="$(< tmp wc -l 2> /dev/null)"
 if [ "$files_count" -eq 0 ]; then
-  log_error "No pictures found! Exiting....\n"
+  log_error "No input files found! Exiting....\n"
   rm tmp
   exit 1
 fi
+
+mkdir -p "$output_folder"
 
 count=0
 
