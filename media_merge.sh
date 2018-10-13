@@ -3,19 +3,19 @@ video_folder="video"
 audio_folder="audio"
 output_folder="output"
 
-log_info(){
+log_info() {
   printf "[\e[36m%s\e[0m] [\e[32mINFO\e[0m] $*" "$(date +'%H:%M:%S')"
 }
 
-log_warn(){
+log_warn() {
   printf "[\e[36m%s\e[0m] [\e[33mWARNING\e[0m] $*" "$(date +'%H:%M:%S')"
 }
 
-log_error(){
+log_error() {
   printf "[\e[36m%s\e[0m] [\e[91mERROR\e[0m] $*" "$(date +'%H:%M:%S')"
 }
 
-check_tools(){
+check_tools() {
   tools="ffmpeg"
   for tool in $tools; do
     if [ ! "$(command -v "$tool")" ]; then
@@ -28,23 +28,23 @@ check_tools(){
 check_tools
 
 {
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.MP4' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.mp4' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.MPG' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.mpg' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.MPEG' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.mpeg' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.AVI' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.avi' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.WMV' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.wmv' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.MOV' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.mov' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.3GP' 2> /dev/null
-  find $video_folder ! -name "$(printf "*\n*")" -name '*.3gp' 2> /dev/null
-} > tmp
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.MP4' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.mp4' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.MPG' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.mpg' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.MPEG' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.mpeg' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.AVI' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.avi' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.WMV' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.wmv' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.MOV' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.mov' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.3GP' 2>/dev/null
+  find $video_folder ! -name "$(printf "*\n*")" -name '*.3gp' 2>/dev/null
+} >tmp
 
-files_count="$(< tmp wc -l 2> /dev/null)"
+files_count="$(wc <tmp -l 2>/dev/null)"
 if [ "$files_count" -eq 0 ]; then
   log_error "No input files found! Exiting....\n"
   rm tmp
@@ -60,7 +60,6 @@ while IFS= read -r file; do
   file="$(echo "$file" | cut -d '/' -f 2)"
   log_info "Processing file $count.... "
   video_file="$file"
-  
   audio_file="$(echo "$video_file" | cut -d '/' -f 2)"
   audio_file="${audio_file%.*}"
   audio_exts="MP4 mp4 MPG mpg MPEG mpeg AVI avi WMV wmv MOV mov 3GP 3gp M4A m4a MP3 mp3 WMA wma AAC aac WAV wav"
@@ -69,7 +68,7 @@ while IFS= read -r file; do
       audio_file="$audio_file.$ext"
     fi
   done
-  
+
   if [ "$audio_file" = "${audio_file%.*}" ]; then
     count="$((count - 1))"
     echo "Failed!"
@@ -79,7 +78,6 @@ while IFS= read -r file; do
     echo "OK"
     log_info "Merging file $count... "
     ffmpeg -hide_banner -loglevel panic -i "$video_folder/$video_file" -i "$audio_folder/$audio_file" -c copy -map 0:v:0 -map 1:a:0 "$output_folder/$video_file"
-
     ffmpeg_status="$?"
     if [ "$ffmpeg_status" != 0 ]; then
       count="$((count - 1))"
@@ -100,7 +98,7 @@ while IFS= read -r file; do
       echo ""
     fi
   fi
-done < tmp
+done <tmp
 rm tmp
 
 if [ "$count" -eq 1 ]; then
