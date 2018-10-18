@@ -106,3 +106,6 @@ if [ "$count" -eq 1 ]; then
 else
   log_info "$count files merged!\n"
 fi
+
+printf "Press enter to exit..."
+read -r
